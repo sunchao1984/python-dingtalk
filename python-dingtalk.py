@@ -2,8 +2,9 @@
 # 依赖库：requests
 import requests
 
+
 class Dingtalk(object):
-    def __init__(self, corpid, corpsecret):
+    def __init__(self, corpid, corpsecret): # 初始化的时候需要获取corpid和corpsecret，需要从管理后台获取
         self.__params = {
             'corpid': corpid,
             'corpsecert': corpsecret
@@ -16,6 +17,8 @@ class Dingtalk(object):
         self.url_delete_dept = 'https://oapi.dingtalk.com/department/delete'
         self.url_get_user_id_by_unionid = 'https://oapi.dingtalk.com/user/getUseridByUnionid'
         self.url_get_user_detail = 'https://oapi.dingtalk.com/user/get'
+        self.url_send_message = 'https://oapi.dingtalk.com/message/send_to_conversation'
+        self.url_get_user_count = 'https://oapi.dingtalk.com/user/get_org_user_count'
         self.__token_params = {
             'access_token': self.__token
         }
@@ -86,6 +89,34 @@ class Dingtalk(object):
             return res.json()
         except:
             self.__raise_error(res)
+
+    def send_message(self, userid, cid, message):
+        payload = {
+            'sender': userid,
+            'cid': cid,
+            'msgtype': 'text',
+            'text': {
+                'content', message
+            }
+        }
+        params = self.__token_params
+        res = requests.post(self.url_send_message, params=params, data=payload)
+        try:
+            return res.json()
+        except:
+            self.__raise_error(res)
+
+    def get_user_count(self, only_active=0):
+        params = self.__token_params
+        params.update({'onlyActive': only_active})
+        res = requests.get(self.url_get_user_count, params=params)
+        try:
+            return res.json()['count']
+        except:
+            self.__raise_error(res)
+
+
+
 
 
 
